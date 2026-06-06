@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NovaMind AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#0a0a0f;--bg2:#111118;--bg3:#18181f;--surface:#1e1e28;
+--border:#2a2a38;--accent:#7c6ff7;--accent2:#a78bfa;
+--text:#f0eeff;--muted:#8887a0;--green:#22d3a0;--pink:#f472b6;
+}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;min-height:100vh;overflow-x:hidden}
+
+.sidebar{position:fixed;left:0;top:0;width:240px;height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100}
+.logo{padding:24px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#7c6ff7,#a78bfa);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.logo-name{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;background:linear-gradient(90deg,#a78bfa,#22d3a0);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav{padding:16px 12px;flex:1;overflow-y:auto}
+.nav-section{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;padding:8px 8px 4px;margin-top:8px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;font-size:14px;color:var(--muted);transition:all .2s;margin-bottom:2px;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:var(--surface);color:var(--text)}
+.nav-item.active{background:rgba(124,111,247,.15);color:#a78bfa}
+.nav-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;padding:2px 6px;border-radius:20px}
+.sidebar-footer{padding:16px;border-top:1px solid var(--border)}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;background:var(--surface);cursor:pointer}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#7c6ff7,#f472b6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff}
+.user-name{font-size:13px;font-weight:500}
+.user-plan{font-size:11px;color:#22d3a0}
+
+.main{margin-left:240px;min-height:100vh;display:flex;flex-direction:column}
+.topbar{padding:16px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px;background:var(--bg2)}
+.topbar-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;flex:1}
+.search-bar{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 14px;flex:1;max-width:340px}
+.search-bar input{background:none;border:none;outline:none;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;width:100%}
+.search-bar input::placeholder{color:var(--muted)}
+.btn{padding:8px 18px;border-radius:8px;border:none;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:500;transition:all .2s}
+.btn-ghost{background:var(--surface);color:var(--muted);border:1px solid var(--border)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2)}
+.theme-btn{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--surface);border:1px solid var(--border);cursor:pointer;color:var(--muted);font-size:18px;transition:.2s}
+
+.chat-area{flex:1;display:flex;flex-direction:column;max-width:860px;margin:0 auto;width:100%;padding:0 24px}
+.chat-messages{flex:1;padding:28px 0 0;display:flex;flex-direction:column;gap:20px;overflow-y:auto;max-height:calc(100vh - 220px)}
+.welcome{text-align:center;padding:48px 0 32px}
+.welcome h1{font-family:'Syne',sans-serif;font-size:40px;font-weight:800;background:linear-gradient(135deg,#a78bfa 0%,#22d3a0 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:10px}
+.welcome p{color:var(--muted);font-size:16px;line-height:1.6}
+.suggestions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:32px}
+.suggestion-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;text-align:left;transition:all .2s;display:flex;align-items:flex-start;gap:12px}
+.suggestion-card:hover{border-color:var(--accent);background:rgba(124,111,247,.08)}
+.sugg-icon{font-size:22px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:rgba(124,111,247,.1);border-radius:10px;flex-shrink:0}
+.sugg-text strong{display:block;font-size:14px;margin-bottom:4px;color:var(--text)}
+.sugg-text span{font-size:12px;color:var(--muted)}
+.msg{display:flex;gap:12px;align-items:flex-start;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.msg.user{flex-direction:row-reverse}
+.msg-avatar{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#fff}
+.msg-avatar.ai{background:linear-gradient(135deg,#7c6ff7,#a78bfa)}
+.msg-avatar.user{background:linear-gradient(135deg,#22d3a0,#0ea5e9);font-size:12px}
+.msg-bubble{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:13px 16px;font-size:14px;line-height:1.7;max-width:78%}
+.msg.user .msg-bubble{background:rgba(124,111,247,.12);border-color:rgba(124,111,247,.3)}
+.input-area{padding:20px 0 28px}
+.input-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px 16px;display:flex;align-items:flex-end;gap:12px;transition:.2s}
+.input-box:focus-within{border-color:var(--accent)}
+.input-box textarea{flex:1;background:none;border:none;outline:none;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;resize:none;max-height:140px;line-height:1.5}
+.input-box textarea::placeholder{color:var(--muted)}
+.send-btn{width:38px;height:38px;border-radius:10px;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.2s;color:#fff;font-size:18px}
+.send-btn:hover{background:var(--accent2)}
+.input-tools{display:flex;gap:8px;margin-top:10px;align-items:center}
+.input-tool{background:none;border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--muted);cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:.2s}
+.input-tool:hover{border-color:var(--accent);color:#a78bfa}
+.page{display:none;padding:28px}
+.page.active{display:block}
+.page-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:6px}
+.page-sub{color:var(--muted);font-size:14px;margin-bottom:28px}
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.tool-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;cursor:pointer;transition:all .2s}
+.tool-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.tool-icon{font-size:28px;margin-bottom:12px}
+.tool-card h3{font-size:15px;font-weight:600;margin-bottom:6px;color:var(--text)}
+.tool-card p{font-size:13px;color:var(--muted);line-height:1.5}
+.manga-banner{background:linear-gradient(135deg,rgba(124,111,247,.15),rgba(244,114,182,.1));border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:24px;text-align:center}
+.manga-banner h2{font-family:'Syne',sans-serif;font-size:22px;margin-bottom:8px}
+.manga-banner p{color:var(--muted);font-size:14px}
+.manga-notify{display:flex;gap:12px;justify-content:center;margin-top:20px}
+
+@media(max-width:700px){
+  .sidebar{width:60px}
+  .logo-name,.nav-section,.nav-item span:not(.nav-badge),.user-info,.nav-badge{display:none}
+  .logo{justify-content:center}
+  .user-card{justify-content:center}
+  .main{margin-left:60px}
+  .suggestions{grid-template-columns:1fr}
+  .welcome h1{font-size:28px}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">✦</div>
+    <span class="logo-name">NovaMind</span>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">Principal</div>
+    <button class="nav-item active" onclick="showPage('chat',this)">
+      <span>💬</span><span>Chat</span>
+    </button>
+    <button class="nav-item" onclick="showPage('image',this)">
+      <span>🎨</span><span>Imagens</span>
+      <span class="nav-badge">IA</span>
+    </button>
+    <button class="nav-item" onclick="showPage('tools',this)">
+      <span>⚡</span><span>Ferramentas</span>
+    </button>
+    <div class="nav-section">Histórico</div>
+    <button class="nav-item" onclick="loadHistory(this,'Explique como funciona IA')">
+      <span>🕐</span><span>Explique como funciona IA</span>
+    </button>
+    <button class="nav-item" onclick="loadHistory(this,'Crie um roteiro de vídeo')">
+      <span>🕑</span><span>Crie um roteiro de vídeo</span>
+    </button>
+    <div class="nav-section">Em breve</div>
+    <button class="nav-item" onclick="showPage('manga',this)" style="opacity:.7">
+      <span>📚</span><span>Mangás</span>
+      <span class="nav-badge" style="background:#f472b6">novo</span>
+    </button>
+    <button class="nav-item" style="opacity:.4;cursor:default">
+      <span>👥</span><span>Comunidade</span>
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="avatar">A</div>
+      <div class="user-info" style="flex:1;min-width:0">
+        <div class="user-name">Arthur</div>
+        <div class="user-plan">✦ Plano Free</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <span class="topbar-title" id="page-title">Chat</span>
+    <div class="search-bar">
+      <span style="color:var(--muted)">🔍</span>
+      <input type="text" placeholder="Pesquisar...">
+    </div>
+    <button class="theme-btn" onclick="toggleTheme()">🌙</button>
+    <button class="btn btn-primary" onclick="showUpgrade()">⚡ Premium</button>
+  </div>
+
+  <!-- CHAT -->
+  <div id="page-chat" class="chat-area" style="display:flex;flex-direction:column">
+    <div class="chat-messages" id="chat-messages">
+      <div class="welcome" id="welcome">
+        <h1>Olá, Arthur ✦</h1>
+        <p>Sou o NovaMind, sua IA para criar, aprender e explorar.<br>Com o que posso te ajudar hoje?</p>
+        <div class="suggestions">
+          <div class="suggestion-card" onclick="sendSugg('Escreva um roteiro criativo para um vídeo de games')">
+            <div class="sugg-icon">🎮</div>
+            <div class="sugg-text"><strong>Roteiro de Games</strong><span>Crie roteiros para seus vídeos</span></div>
+          </div>
+          <div class="suggestion-card" onclick="sendSugg('Traduza e melhore meu texto para inglês')">
+            <div class="sugg-icon">🌍</div>
+            <div class="sugg-text"><strong>Traduzir texto</strong><span>Português, inglês e mais</span></div>
+          </div>
+          <div class="suggestion-card" onclick="sendSugg('Me explique como funciona inteligência artificial')">
+            <div class="sugg-icon">🤖</div>
+            <div class="sugg-text"><strong>Aprender sobre IA</strong><span>Explicações simples e diretas</span></div>
+          </div>
+          <div class="suggestion-card" onclick="sendSugg('Crie um quiz de games para postar no canal')">
+            <div class="sugg-icon">🎯</div>
+            <div class="sugg-text"><strong>Quiz para canal</strong><span>Engaja sua audiência</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="input-area">
+      <div class="input-box">
+        <textarea id="chat-input" rows="1" placeholder="Pergunte qualquer coisa..." onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" onclick="sendMsg()">➤</button>
+      </div>
+      <div class="input-tools">
+        <button class="input-tool">📎 Arquivo</button>
+        <button class="input-tool">🖼️ Imagem</button>
+        <button class="input-tool">🎤 Voz</button>
+        <span style="margin-left:auto;font-size:12px;color:var(--muted)">NovaMind v1.0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOLS -->
+  <div id="page-tools" class="page">
+    <div class="page-title">Ferramentas</div>
+    <div class="page-sub">Tudo para criar conteúdo com IA</div>
+    <div class="tools-grid">
+      <div class="tool-card" onclick="useTool('resumir um texto')"><div class="tool-icon">📝</div><h3>Resumidor</h3><p>Cole qualquer texto e receba um resumo claro</p></div>
+      <div class="tool-card" onclick="useTool('traduzir um texto')"><div class="tool-icon">🌍</div><h3>Tradutor</h3><p>Traduza para qualquer idioma com naturalidade</p></div>
+      <div class="tool-card" onclick="useTool('criar uma história')"><div class="tool-icon">✍️</div><h3>Criador de Histórias</h3><p>Gere histórias, roteiros e narrativas</p></div>
+      <div class="tool-card" onclick="useTool('criar título para vídeo do YouTube')"><div class="tool-icon">▶️</div><h3>Título de Vídeo</h3><p>Títulos otimizados para gerar mais cliques</p></div>
+      <div class="tool-card" onclick="useTool('criar descrição para YouTube com SEO')"><div class="tool-icon">📋</div><h3>Descrição YouTube</h3><p>Descrições com SEO para crescer no algoritmo</p></div>
+      <div class="tool-card" onclick="useTool('criar um quiz de games')"><div class="tool-icon">🎯</div><h3>Gerador de Quiz</h3><p>Quizzes temáticos para engajar seu público</p></div>
+      <div class="tool-card" onclick="useTool('gerar nicks criativos para games')"><div class="tool-icon">🎮</div><h3>Gerador de Nick</h3><p>Nomes épicos para Roblox, Free Fire e mais</p></div>
+      <div class="tool-card" onclick="useTool('corrigir e melhorar meu texto')"><div class="tool-icon">✅</div><h3>Corretor de Texto</h3><p>Corrija gramática e melhore seu estilo</p></div>
+    </div>
+  </div>
+
+  <!-- IMAGENS -->
+  <div id="page-image" class="page">
+    <div class="page-title">Geração de Imagens</div>
+    <div class="page-sub">Descreva e veja sua ideia ganhar vida</div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;max-width:640px">
+      <textarea id="img-prompt" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;resize:none;height:90px;outline:none;line-height:1.6" placeholder="Ex: personagem anime guerreiro com espada de fogo, estilo mangá, fundo roxo..."></textarea>
+      <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;align-items:center">
+        <select style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none">
+          <option>Estilo: Anime</option><option>Estilo: Realista</option><option>Estilo: Pixel Art</option><option>Estilo: Cartoon</option>
+        </select>
+        <select style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none">
+          <option>1:1 Quadrado</option><option>16:9 Paisagem</option><option>9:16 Retrato</option>
+        </select>
+        <button class="btn btn-primary" style="margin-left:auto" onclick="genImage()">✦ Gerar imagem</button>
+      </div>
+      <div id="img-result" style="margin-top:20px;display:none">
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;height:280px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px">
+          <div style="font-size:48px">🎨</div>
+          <div style="color:var(--muted);font-size:14px">Gerando sua imagem com IA...</div>
+          <div style="width:60%;background:var(--border);border-radius:20px;height:4px;overflow:hidden">
+            <div id="img-progress" style="width:0%;height:100%;background:linear-gradient(90deg,#7c6ff7,#22d3a0);transition:width .3s;border-radius:20px"></div>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-top:10px;text-align:center">⚡ Geração real de imagens disponível no plano Premium</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MANGA -->
+  <div id="page-manga" class="page">
+    <div class="page-title">Biblioteca de Mangás</div>
+    <div class="page-sub">Sua coleção pessoal de mangás online</div>
+    <div class="manga-banner">
+      <div style="font-size:48px;margin-bottom:12px">📚</div>
+      <h2>Em desenvolvimento!</h2>
+      <p>A biblioteca de mangás está chegando em breve.<br>Você poderá fazer upload dos seus mangás e ler online.</p>
+      <div class="manga-notify">
+        <button class="btn btn-primary" onclick="alert('✦ Você será notificado quando os mangás estiverem disponíveis!')">🔔 Me notifique</button>
+        <button class="btn btn-ghost">Saiba mais</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:16px;opacity:.3;pointer-events:none">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;aspect-ratio:.7;display:flex;align-items:center;justify-content:center;font-size:40px">📖</div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;aspect-ratio:.7;display:flex;align-items:center;justify-content:center;font-size:40px">📗</div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;aspect-ratio:.7;display:flex;align-items:center;justify-content:center;font-size:40px">📕</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const resps={
+  default:["Olá! Posso te ajudar a criar roteiros, resumir textos, gerar ideias e muito mais! O que você quer fazer?","Boa pergunta! Aqui vai minha resposta completa para você:","Claro! Isso é exatamente o tipo de coisa que faço muito bem. Veja:","Entendido! Preparei algo especial para você:"],
+  roteiro:"🎬 Roteiro do vídeo:\n\nINTRO (0-15s): Música épica + gameplay\n'Fala galera, hoje vou mostrar o desafio mais insano que já fiz...'\n\nDESENVOLVIMENTO: Bastidores, reações genuínas e momentos engraçados\n\nCLÍMAX: O momento épico que todo mundo veio ver\n\nENCERRAMENTO: 'Se curtiu, deixa o like e ativa o sininho!'",
+  quiz:"🎯 Quiz de Games:\n\n1. Qual é o mascote do Roblox? → Noob\n2. Em Minecraft, qual minério é mais raro? → Netherite\n3. No Free Fire, quantos jogadores começam cada partida? → 50\n4. O que significa GG? → Good Game\n5. Qual jogo tem o maior mapa aberto do mundo? → Minecraft (infinito!)",
+  nick:"🎮 Nicks épicos gerados pela IA:\n• ShadowBlade_X\n• NovaMind_Pro\n• ArthurGOD\n• DarkPhoenix99\n• GhostRaider_BR\n• ViperStrike\n• LegendArth\n• NightHunter_7"
+};
+let count=0;
+function getResp(t){
+  t=t.toLowerCase();
+  if(t.includes('roteiro')||t.includes('vídeo')||t.includes('video'))return resps.roteiro;
+  if(t.includes('quiz'))return resps.quiz;
+  if(t.includes('nick')||t.includes('nome'))return resps.nick;
+  return resps.default[count%resps.default.length];
+}
+function addMsg(text,isUser){
+  const w=document.getElementById('welcome');
+  if(w)w.remove();
+  const box=document.getElementById('chat-messages');
+  const div=document.createElement('div');
+  div.className='msg '+(isUser?'user':'ai');
+  const av=document.createElement('div');
+  av.className='msg-avatar '+(isUser?'user':'ai');
+  av.textContent=isUser?'A':'✦';
+  const b=document.createElement('div');
+  b.className='msg-bubble';
+  b.style.whiteSpace='pre-line';
+  b.textContent=text;
+  div.appendChild(av);div.appendChild(b);
+  box.appendChild(div);
+  box.scrollTop=box.scrollHeight;
+  count++;
+}
+function sendMsg(){
+  const inp=document.getElementById('chat-input');
+  const t=inp.value.trim();
+  if(!t)return;
+  addMsg(t,true);
+  inp.value='';inp.style.height='auto';
+  showPage('chat');
+  setTimeout(()=>addMsg(getResp(t),false),700);
+}
+function sendSugg(t){document.getElementById('chat-input').value=t;sendMsg();}
+function useTool(t){showPage('chat');document.getElementById('chat-input').value='Me ajude a '+t;sendMsg();}
+function loadHistory(btn,t){showPage('chat');sendSugg(t);}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,140)+'px';}
+function showPage(name,btn){
+  const pages=['chat','tools','image','manga'];
+  pages.forEach(p=>{
+    const el=document.getElementById('page-'+p);
+    if(el)el.style.display='none';
+  });
+  const chat=document.getElementById('page-chat');
+  if(name==='chat'){chat.style.display='flex';chat.style.flexDirection='column';}
+  else{
+    const el=document.getElementById('page-'+name);
+    if(el){el.style.display='block';}
+  }
+  document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  const titles={chat:'Chat',tools:'Ferramentas',image:'Geração de Imagens',manga:'Mangás'};
+  document.getElementById('page-title').textContent=titles[name]||'NovaMind';
+}
+function toggleTheme(){
+  const r=document.documentElement;
+  const dark=getComputedStyle(r).getPropertyValue('--bg').trim()==='#0a0a0f';
+  if(dark){
+    r.style.setProperty('--bg','#f5f5ff');r.style.setProperty('--bg2','#efeffc');
+    r.style.setProperty('--bg3','#e8e8f5');r.style.setProperty('--surface','#e0dff5');
+    r.style.setProperty('--border','#c8c7e0');r.style.setProperty('--text','#1a1830');
+    r.style.setProperty('--muted','#6b6988');
+  }else{
+    r.style.setProperty('--bg','#0a0a0f');r.style.setProperty('--bg2','#111118');
+    r.style.setProperty('--bg3','#18181f');r.style.setProperty('--surface','#1e1e28');
+    r.style.setProperty('--border','#2a2a38');r.style.setProperty('--text','#f0eeff');
+    r.style.setProperty('--muted','#8887a0');
+  }
+}
+function genImage(){
+  const p=document.getElementById('img-prompt').value;
+  if(!p.trim()){alert('Digite uma descrição!');return;}
+  const res=document.getElementById('img-result');res.style.display='block';
+  const bar=document.getElementById('img-progress');let pct=0;
+  const iv=setInterval(()=>{pct+=Math.random()*15;if(pct>=90){pct=90;clearInterval(iv);}bar.style.width=pct+'%';},200);
+}
+function showUpgrade(){
+  alert('✦ NovaMind Premium\n\n⚡ Chat ilimitado\n🎨 Geração de imagens com IA\n📚 Mangás ilimitados\n🚀 Respostas prioritárias\n\nEm breve disponível!');
+}
+</script>
+</body>
+</html>
